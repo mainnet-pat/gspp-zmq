@@ -1,0 +1,20 @@
+{
+  "name": "gspp-zmq",
+  "version": "0.0.1",
+  "description": "Listens to gspp-zmq notification and sends them to clients over SSE",
+  "main": "index.js",
+  "scripts": {},
+  "author": "mainnet-pat",
+  "license": "MIT",
+  "dependencies": {
+    "cashaddrjs-slp": "^0.2.12",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.4",
+    "ip": "^1.1.5",
+    "zeromq": "^5.1.0"
+  },
+  "devDependencies": {
+    "eventsource": "^1.1.0"
+  }
+}
