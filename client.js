@@ -3,8 +3,8 @@ const EventSource = require('eventsource');
 const init = function(config) {
   setTimeout(() => {
     const query = {
-      tokenId: "test",
-      slpaddr: "test"
+      // tokenId: "test",
+      // slpaddr: "test"
     };
 
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64");

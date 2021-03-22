@@ -35,7 +35,7 @@ const init = function(config) {
             }
 
             if (connection.query.slpaddr !== undefined) {
-              const addrs = [...data.inputs, ...data.outputs];
+              const addrs = [...(data.inputs || []), ...(data.outputs || [])];
               if (addrs.findIndex(connection.query.slpaddr < 0))
                 return;
             }
