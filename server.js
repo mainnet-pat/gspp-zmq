@@ -41,12 +41,12 @@ const init = function(config) {
       connections.pool[fingerprint] = { res: res, query: query }
 
       console.log("## Opening connection from: " + fingerprint)
-      console.log(JSON.stringify(req.headers, null, 2))
+      // console.log(JSON.stringify(req.headers, null, 2))
       req.on("close", function() {
         console.log("## Closing connection from: " + res.$fingerprint)
-        console.log(JSON.stringify(req.headers, null, 2))
+        // console.log(JSON.stringify(req.headers, null, 2))
         delete connections.pool[res.$fingerprint]
-        console.log(".. Pool size is now", Object.keys(connections.pool).length)
+        console.log(".. Pool size is now", Object.keys(connections.pool).length, "clients")
       })
     } catch (e) {
       console.log(e)
@@ -63,7 +63,7 @@ const init = function(config) {
 
   // set up heartbeat
   setInterval(function() {
-    console.log('## Sending heartbeat to ' + Object.keys(connections.pool).length);
+    console.log('## Sending heartbeat to ' + Object.keys(connections.pool).length + ' clients');
     Object.keys(connections.pool).forEach(async function(key) {
       let connection = connections.pool[key]
       connection.res.sseHeartbeat()

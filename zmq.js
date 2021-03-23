@@ -17,15 +17,17 @@ const init = function(config) {
 
       const data = JSON.parse(json.toString());
 
+      if (config.verbose) {
+        console.log(JSON.stringify(data, null, 2));
+      }
+
       switch (type) {
         case "rawtx": {
           Object.keys(connections.pool).forEach(async function(key) {
-            data.inputs = data.inputs.map(val => scriptPubKeyToCashaddr(val));
-            data.outputs = data.outputs.map(val => scriptPubKeyToCashaddr(val));
-
-            if (config.verbose) {
-              console.log(data);
-            }
+            // we have to decode the cashaddrs down to their pubkeyhash
+            // because bchaddrjs-slp treats regtest as testnet
+            const inputs = data.inputs ? data.inputs.map(val => cashaddrjs.decode(val).hash) : [];
+            const outputs = data.outputs ? data.outputs.map(val => cashaddrjs.decode(val).hash) : [];
 
             let connection = connections.pool[key]
             if (!connection.query) connection.query = {};
@@ -35,9 +37,11 @@ const init = function(config) {
             }
 
             if (connection.query.slpaddr !== undefined) {
-              const addrs = [...(data.inputs || []), ...(data.outputs || [])];
-              if (addrs.findIndex(connection.query.slpaddr < 0))
+              const targetHash = cashaddrjs.decode(connection.query.slpaddr).hash;
+              const addrs = [...inputs, ...outputs];
+              if (!addrs.some(val => arrayEqual(targetHash, val))) {
                 return;
+              }
             }
 
             connection.res.sseSend({ type: type, data: data });
@@ -51,19 +55,8 @@ const init = function(config) {
   })
 }
 
-function scriptPubKeyToCashaddr(script) {
-  let buf = Buffer.from(script, "hex");
-  let type = "";
-  let hash = "";
-  if (buf[0] == 0x76 && buf[1] == 0xa9) {
-    type = "P2PKH";
-    hash = buf.slice(3, buf.length - 2);
-  } else if (buf.length == 23 && buf[0] == 0xa9 && buf[22] == 0x87) {
-    type = "P2SH";
-    hash = buf.slice(1, 21);
-  }
-
-  return cashaddrjs.encode("simpleledger", type, hash);
+function arrayEqual(arr1, arr2) {
+  return (arr1.length == arr2.length && arr1.every((v) => arr2.indexOf(v) >= 0));
 }
 
 module.exports = { init: init }
