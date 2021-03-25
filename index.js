@@ -16,4 +16,4 @@ const config = {
 
 server.init(config);
 zmq.init(config);
-if (process.env.DEBUG) require('./client.js').init(config);
+/* if (process.env.DEBUG) */ require('./client.js').init(config);
